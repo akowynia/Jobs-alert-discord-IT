@@ -30,6 +30,22 @@ def createConfig():
         except:
             logger.error('Template config not created.')
 
+    if not os.path.isfile("configs/files_excel.ini"):
+        try:
+    # username,avatar_url , description, title, url_webhook
+            
+            config["Template"] = {'username': "template",
+                            'avatar_url_discord': "url_avatar",
+                            'url_webhook_discord': "template"
+
+                            }
+            with open("configs/files_excel.ini", 'w') as configfile:
+                config.write(configfile)
+
+            logger.info('Template config excel has created.')
+        except:
+            logger.error('Template config excel not created.')
+
 
 # tworzy bazę danych sqllite
 def createDatabase():

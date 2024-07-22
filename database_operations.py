@@ -11,6 +11,7 @@ import time
 class database_operations:
     def __init__(self):
         pass
+    
 
     def check_duplicate(self, link):
         """
@@ -233,3 +234,19 @@ class database_operations:
 
         db.commit()
         db.close()
+
+    def excel_file_data(self):
+        
+        db = sqlite3.connect('discord_bot.db')
+        cursor = db.cursor()
+        day = str(date.today()) + " %"
+        data = (day,)
+        sql = ''' select id,jobService,currentTime,linkOffer,offerTitle,region from JobsInformation where currentTime like ? '''
+        cursor.execute(sql, data)
+
+        rows = cursor.fetchall()
+            
+        db.commit()
+        db.close()
+        return rows
+        

@@ -8,7 +8,7 @@ from class_folder.theitprotocol_scrapper import theitprotocol_scrapper
 from database_operations import database_operations
 import requests
 import bs4
-
+from Generate_excel_file import Generate_excel_file
 
 
 import logging
@@ -118,12 +118,17 @@ class run_scrapper:
                         
     #funkcja która wywołuje wysyłkę na czat discorda
     def send_discord_info(self):
-
+        
         logger.info('try sending to discord')
-
+        excel_file = Generate_excel_file()
         database = database_operations()
+
+        excel_file.create_excel_file(database.excel_file_data())
         database.not_sended()
         database.get_added_today()
+
+
+        
         pass
 
 

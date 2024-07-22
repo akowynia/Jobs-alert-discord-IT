@@ -57,6 +57,30 @@ first_time = True
 
 ```
 
+Aktualizacja 22-07-2024:
+
+## Generowanie i wysyłanie pliku XLSX
+
+Ten bot teraz ma możliwość generowania pliku XLSX, który zawiera zebrane oferty pracy. Plik jest tworzony automatycznie po zakończeniu procesu scrapowania.
+
+Aby skorzystać z tej funkcji, musisz zainstalować dodatkową bibliotekę `openpyxl` za pomocą polecenia `pip install openpyxl`.
+
+Plik XLSX jest zapisywany w katalogu głównym projektu pod nazwą `jobs_offers.xlsx`. Każde uruchomienie skryptu nadpisuje istniejący plik XLSX nowymi danymi.
+
+Dodatkowo, bot ma teraz możliwość wysyłania wygenerowanego pliku XLSX na serwer Discorda. Aby skorzystać z tej funkcji, musisz dodać do pliku konfiguracyjnego `configs/websites.ini` ] Przykład konfiguracji wygląda w ten sposób:
+
+```ini
+[Template]
+username = username 
+url_webhook_discord = your_discord_webhook_url
+avatar_url_discord = your_discord_webhook_avatar
+```
+Plik konfiguracyjny tworzy się po uruchomieniu skryptu.
+
+
+
+
+
 
 ## Uruchomienie
 
