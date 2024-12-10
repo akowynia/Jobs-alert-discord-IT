@@ -20,15 +20,16 @@ class olx_pl_scrapper:
         content = bs4.BeautifulSoup(res.text,features="html.parser")
 
         elems = content.findAll(attrs={"data-cy": "l-card"})
-
+        
         for elements in elems:
 
             try:
                 #rozbiera elementy na części
                 link = elements.find_all('a')
-                title = elements.find_all('h6')
+                # zmieniono z h6 na h4 / 2024-12-10
+                title = elements.find_all('h4')
                 region = elements.find_all('span')
-
+                
                 # data = [link[0].get('href'), title[0].get_text(),region[0].get_text()]
 
                 data_op = database_operations()
@@ -44,8 +45,8 @@ class olx_pl_scrapper:
                         data_op.add(
                             olx_link, title[0].get_text(), region[0].get_text(), "olx")
 
-            except:
-                print("not exist")
+            except Exception as e:
+                print("not exist",e,"olx")
 
         # links = bs4.BeautifulSoup(elems.text)
         # link = links.findAll(attrs={"data-test":"link-offer"})
