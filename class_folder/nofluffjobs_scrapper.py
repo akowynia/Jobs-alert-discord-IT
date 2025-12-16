@@ -1,4 +1,4 @@
-import requests
+import cloudscraper
 import bs4
 
 from database_operations import database_operations
@@ -14,8 +14,14 @@ class nofluffjobs_scrapper:
         """
         url = link
         #nawiązuje połączenie
-        res = requests.get(url)
-    
+        scraper = cloudscraper.create_scraper(
+            browser={
+                'browser': 'chrome',
+                'platform': 'darwin',
+                'desktop': True
+            }
+        )
+        res =  scraper.get(url, timeout=15)
         res.raise_for_status()
         #przekształca html obiekt bs4 do przeszukiwania strony
         content = bs4.BeautifulSoup(res.text,features="html.parser")

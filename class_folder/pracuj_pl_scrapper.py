@@ -1,4 +1,4 @@
-import requests
+import cloudscraper
 import bs4
 
 from database_operations import database_operations
@@ -14,44 +14,46 @@ class pracuj_pl_scrapper:
         """
 
         url = link
-        # nawiązuje połączenie
-        res = requests.get(url)
-        res.raise_for_status()
-        # przekształca html obiekt bs4 do przeszukiwania strony
-        content = bs4.BeautifulSoup(res.text,features="html.parser")
+        
+        # Użyj cloudscraper zamiast requests - omija zabezpieczenia Cloudflare
+        scraper = cloudscraper.create_scraper(
+            browser={
+                'browser': 'chrome',
+                'platform': 'darwin',
+                'desktop': True
+            }
+        )
+        
+        try:
+            res = scraper.get(url, timeout=15)
+            res.raise_for_status()
+            
+            # przekształca html obiekt bs4 do przeszukiwania strony
+            content = bs4.BeautifulSoup(res.text, features="html.parser")
 
-        # szuka elementu
-        elems = content.findAll(attrs={"data-test": "default-offer"})
+            # szuka elementu
+            elems = content.findAll(attrs={"data-test": "default-offer"})
 
-        for elements in elems:
+            for elements in elems:
+                try:
+                    # ...existing code...
+                    link = elements.findAll(attrs={"data-test": "link-offer"})
+                    title = elements.findAll(attrs={"data-test": "offer-title"})
+                    region = elements.findAll(attrs={"data-test": "text-region"})
 
-            try:
-                # rozbiera elementy na części
-                link = elements.findAll(attrs={"data-test": "link-offer"})
-                title = elements.findAll(attrs={"data-test": "offer-title"})
-                region = elements.findAll(attrs={"data-test": "text-region"})
+                    data_op = database_operations()
 
-                # data= [link[0].get('href'),title[0].get_text(),region[0].get_text()]
+                    if first == True:
+                        data_op.add_first_time(link[0].get(
+                            'href'), title[0].get_text(), region[0].get_text(), "pracuj")
+                    else:
+                        if data_op.check_duplicate(link[0].get('href')) is not False:
+                            data_op.add(link[0].get('href'), title[0].get_text(
+                            ), region[0].get_text(), "pracuj")
 
-                data_op = database_operations()
-
-                if first == True:
-                    # jeśli jest to pierwsze uruchomienie to dodaje do bazy danych
-                    data_op.add_first_time(link[0].get(
-                        'href'), title[0].get_text(), region[0].get_text(), "pracuj")
-                else:
-                    # jeśli nie to sprawdza czy dany link istnieje w bazie danych
-                    if data_op.check_duplicate(link[0].get('href')) is not False:
-                        data_op.add(link[0].get('href'), title[0].get_text(
-                        ), region[0].get_text(), "pracuj")
-
-            except:
-                print("not exist")
-
-        # links = bs4.BeautifulSoup(elems.text)
-        # link = links.findAll(attrs={"data-test":"link-offer"})
-
-        # link-offer
-
-        # print(link)
-        # print(len(link))
+                except Exception as e:
+                    print(f"Element error: {e}")
+                    
+        except Exception as e:
+            print(f"Request error: {e}")
+            raise
