@@ -55,10 +55,4 @@ class olx_pl_scrapper:
             except Exception as e:
                 print("not exist",e,"olx")
 
-        # links = bs4.BeautifulSoup(elems.text)
-        # link = links.findAll(attrs={"data-test":"link-offer"})
 
-        # link-offer
-
-        # print(link)
-        # print(len(link))

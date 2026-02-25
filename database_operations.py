@@ -74,7 +74,7 @@ class database_operations:
         config_path = "configs/websites.ini"
         config.read(config_path)
         website_dictionary = {'pracuj', 'dla_studenta',
-                              'students_pl', 'olx', 'nofluffjobs', 'theitprotocol'}
+                              'students_pl', 'olx', 'nofluffjobs', 'theitprotocol', 'czy_jest_eldorado'}
         
 
         #zmienne do przechowywania zdjeć bota
@@ -84,44 +84,52 @@ class database_operations:
         students_pl_image = ""
         nofluffjobs_image = ""
         theitprotocol_image = ""
+        czy_jest_eldorado_image = ""
 
-        #zmienne przechowywujące link do webhooka(do wysłania zadania)
-        olx_link = ""
-        pracuj_pl_link = ""
-        dla_studenta_link = ""
-        students_pl_link = ""
-        nofluffjobs_link = ""
-        theitprotocol_link = ""
+        #zmienne przechowywujące listę linków do webhooków
+        olx_links = []
+        pracuj_pl_links = []
+        dla_studenta_links = []
+        students_pl_links = []
+        nofluffjobs_links = []
+        theitprotocol_links = []
+        czy_jest_eldorado_links = []
 
 
         #odczytywanie z pliku konfiguracyjnego linków do webhooków oraz avatarów 
         sections = config.sections()
         for list_website in sections:
             if config[list_website]["website_name"] in website_dictionary:
+                webhook_urls = config[list_website]["url_webhook_discord"].split(';')
+                webhook_urls = [url.strip() for url in webhook_urls if url.strip()]
+                
                 if config[list_website]["website_name"] == "olx":
-                    olx_link = config[list_website]["url_webhook_discord"]
+                    olx_links = webhook_urls
                     olx_discord_image = config[list_website]["avatar_url_discord"]
 
                 if config[list_website]["website_name"] == "pracuj":
-                    pracuj_pl_link = config[list_website]["url_webhook_discord"]
+                    pracuj_pl_links = webhook_urls
                     pracuj_discord_image = config[list_website]["avatar_url_discord"]
 
                 if config[list_website]["website_name"] == "dla_studenta":
-                    dla_studenta_link = config[list_website]["url_webhook_discord"]
+                    dla_studenta_links = webhook_urls
                     dla_studenta_image = config[list_website]["avatar_url_discord"]
 
                 if config[list_website]["website_name"] == "students_pl":
-                    students_pl_link = config[list_website]["url_webhook_discord"]
+                    students_pl_links = webhook_urls
                     students_pl_image = config[list_website]["avatar_url_discord"]
 
                 if config[list_website]["website_name"] == "nofluffjobs":
-                    nofluffjobs_link = config[list_website]["url_webhook_discord"]
+                    nofluffjobs_links = webhook_urls
                     nofluffjobs_image = config[list_website]["avatar_url_discord"]
 
                 if config[list_website]["website_name"] == "theitprotocol":
-                    theitprotocol_link = config[list_website]["url_webhook_discord"]
+                    theitprotocol_links = webhook_urls
                     theitprotocol_image = config[list_website]["avatar_url_discord"]
 
+                if config[list_website]["website_name"] == "czy_jest_eldorado":
+                    czy_jest_eldorado_links = webhook_urls
+                    czy_jest_eldorado_image = config[list_website]["avatar_url_discord"]
 
 
 
@@ -147,27 +155,39 @@ class database_operations:
             
             #wysyła na discorda w zależności od serwisu z którego pochodzi oferta
             if jobService == "olx" and isSended == 0:
-                webhook.send_message(
-                    "olx_bot", olx_discord_image, olx_link, offerTitle, linkOffer, region)
+                for webhook_url in olx_links:
+                    webhook.send_message(
+                        "olx_bot", olx_discord_image, webhook_url, offerTitle, linkOffer, region)
+                        
             if jobService == "pracuj" and isSended == 0:
-                webhook.send_message(
-                    "pracuj_pl", pracuj_discord_image, pracuj_pl_link, offerTitle, linkOffer, region)
+                for webhook_url in pracuj_pl_links:
+                    webhook.send_message(
+                        "pracuj_pl", pracuj_discord_image, webhook_url, offerTitle, linkOffer, region)
 
             if jobService == "dla_studenta" and isSended == 0:
-                webhook.send_message(
-                    "dla_studenta", dla_studenta_image, dla_studenta_link, offerTitle, linkOffer, region)
+                for webhook_url in dla_studenta_links:
+                    webhook.send_message(
+                        "dla_studenta", dla_studenta_image, webhook_url, offerTitle, linkOffer, region)
 
             if jobService == "students_pl" and isSended == 0:
-                webhook.send_message(
-                    "students_pl", students_pl_image, students_pl_link, offerTitle, linkOffer, region)
+                for webhook_url in students_pl_links:
+                    webhook.send_message(
+                        "students_pl", students_pl_image, webhook_url, offerTitle, linkOffer, region)
 
             if jobService == "nofluffjobs" and isSended == 0:
-                webhook.send_message(
-                    "nofluffjobs", nofluffjobs_image, nofluffjobs_link, offerTitle, linkOffer, region)
+                for webhook_url in nofluffjobs_links:
+                    webhook.send_message(
+                        "nofluffjobs", nofluffjobs_image, webhook_url, offerTitle, linkOffer, region)
+                        
             if jobService == "theitprotocol" and isSended == 0:
-                webhook.send_message(
-                    "theitprotocol", theitprotocol_image, theitprotocol_link, offerTitle, linkOffer, region)
+                for webhook_url in theitprotocol_links:
+                    webhook.send_message(
+                        "theitprotocol", theitprotocol_image, webhook_url, offerTitle, linkOffer, region)
 
+            if jobService == "czy_jest_eldorado" and isSended == 0:
+                for webhook_url in czy_jest_eldorado_links:
+                    webhook.send_message(
+                        "czy_jest_eldorado", czy_jest_eldorado_image, webhook_url, offerTitle, linkOffer, region)
 
             time.sleep(2)
 
@@ -249,4 +269,4 @@ class database_operations:
         db.commit()
         db.close()
         return rows
-        
+

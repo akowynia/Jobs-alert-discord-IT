@@ -56,10 +56,4 @@ class students_pl_scrapper:
             except:
                 print("not exist")
 
-        # links = bs4.BeautifulSoup(elems.text)
-        # link = links.findAll(attrs={"data-test":"link-offer"})
 
-        # link-offer
-
-        # print(link)
-        # print(len(link))

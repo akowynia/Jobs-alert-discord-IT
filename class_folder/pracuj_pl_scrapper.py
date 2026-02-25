@@ -36,7 +36,6 @@ class pracuj_pl_scrapper:
 
             for elements in elems:
                 try:
-                    # ...existing code...
                     link = elements.findAll(attrs={"data-test": "link-offer"})
                     title = elements.findAll(attrs={"data-test": "offer-title"})
                     region = elements.findAll(attrs={"data-test": "text-region"})

@@ -53,21 +53,3 @@ class nofluffjobs_scrapper:
 
         except:
                 print("not exist")
-
-
-
-        # for elements in elems:
-
-            # try:
-            #     print(elements)
-
-            # except:
-            #     print("not exist")
-
-        # links = bs4.BeautifulSoup(elems.text)
-        # link = links.findAll(attrs={"data-test":"link-offer"})
-
-        # link-offer
-
-        # print(link)
-        # print(len(link))

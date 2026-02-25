@@ -43,6 +43,7 @@ first_time = "True"
 - olx
 - nofluffjobs 
 - theitprotocol
+- czy_jest_eldorado
 
 `first_time = "True"` - to ustawienie to tylko informacja dla skryptu czy jest pierwszym uruchomieniem danej strony, po przetworzeniu wartość się zmieni.
 
@@ -104,3 +105,4 @@ Projekt zawiera skrypty scrapujące dla następujących stron:
 - pracuj_pl_scrapper.py (pracuj.pl)
 - students_pl_scrapper.py (students.pl)
 - theitprotocol_scrapper.py (theprotocol.it)
+- czy_jest_eldorado_scrapper.py (czyjesteldorado.pl)

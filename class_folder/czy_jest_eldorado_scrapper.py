@@ -1,10 +1,11 @@
 import cloudscraper
 import bs4
+import re
 
 from database_operations import database_operations
 
 
-class dlastudenta_scrapper:
+class czy_jest_eldorado_scrapper:
     def __init__(self) -> None:
         pass
 
@@ -26,38 +27,38 @@ class dlastudenta_scrapper:
         #przekształca html obiekt bs4 do przeszukiwania strony
         content = bs4.BeautifulSoup(res.text,features="html.parser")
         #szuka elementu
-        elems = content.findAll('div', class_="offer")
-
+        elems = content.findAll('div', class_="offer-card-wrapper")
         for elements in elems:
             #sprawdza czy pola które chcemy pobrać istnieją
             try:
-                link = elements.find_all('span', class_="offer_name")
-                link = link[0].find_all('a')
-                title = elements.find_all('span', class_="offer_name")
-                region = elements.find_all('span', class_="singleJobArea")
-
+                link = elements.find_all('a', class_="btn-quick-apply")
                 
-                #dekoduje tekst z utf-8 do iso-8859-1 / problemy z pobieraniem były
-                raw_text = title[0].get_text()
-                decoded_title = raw_text.encode('ISO-8859-1').decode('utf-8')
-
-                raw_text=region[0].get_text()
-                decoded_region = raw_text.encode('ISO-8859-1').decode('utf-8')
+                link = link[0].get('href')
+                title = elements.find_all('div', class_="job-title")
+                title = title[0].get('title')
+                region_list = elements.find_all('span')
+                region = ""
+                for span in region_list:
+                    if "data-bs-toggle" in span.attrs:
+                        region = span.get('title') or ""
+                        region = re.sub(r"\s+", " ", region).strip()
+                        if not region or re.match(r'(?i)^(dodana\b|\d+\s+dni?\s+temu|wczoraj|dzisiaj|godz|minut)', region):
+                            region = "Brak regionu"
+                        break
 
                 
                 data_op = database_operations()
                 
-                students_link = link[0].get('href')
 
                 if first == True:
                     #jeśli jest to pierwsze uruchomienie to dodaje do bazy danych
                     data_op.add_first_time(
-                        students_link, decoded_title, decoded_region, "dla_studenta")
+                        link, title, region, "czy_jest_eldorado")
                 else:
                     #jeśli nie to sprawdza czy dany link istnieje w bazie danych
-                    if data_op.check_duplicate(students_link) is not False:
+                    if data_op.check_duplicate(link) is not False:
                         data_op.add(
-                            students_link, decoded_title, decoded_region, "dla_studenta")
+                            link, title, region, "czy_jest_eldorado")
 
             except:
                 print("not exist")

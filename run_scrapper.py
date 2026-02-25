@@ -5,6 +5,7 @@ from class_folder.dlastudenta_pl_scrapper import dlastudenta_scrapper
 from class_folder.students_pl_scrapper import students_pl_scrapper
 from class_folder.nofluffjobs_scrapper import nofluffjobs_scrapper
 from class_folder.theitprotocol_scrapper import theitprotocol_scrapper
+from class_folder.czy_jest_eldorado_scrapper import czy_jest_eldorado_scrapper
 from database_operations import database_operations
 import requests
 import bs4
@@ -31,7 +32,7 @@ class run_scrapper:
 
         #zawiera nazwy stron które są obsługiwane wszystkie klasy znajdują się w folderze class_folder
 
-        website_dictionary = {'pracuj', 'dla_studenta', 'students_pl','olx', 'nofluffjobs','theitprotocol','justjoinit'}
+        website_dictionary = {'pracuj', 'dla_studenta', 'students_pl','olx', 'nofluffjobs','theitprotocol','justjoinit', 'czy_jest_eldorado'}
         
         #odczytuje sekcje z pliku konfiguracyjnego
         sections = config.sections()
@@ -84,6 +85,12 @@ class run_scrapper:
                             theitprotocol = theitprotocol_scrapper()
                             theitprotocol.scrap(config[list_website]
                                          ["website_to_scrap"],True)
+                    if config[list_website]["website_name"] == "czy_jest_eldorado":
+                        with open(config_path, 'w') as configfile:
+                            config.write(configfile)
+                            czy_jest_eldorado = czy_jest_eldorado_scrapper()
+                            czy_jest_eldorado.scrap(config[list_website]
+                                         ["website_to_scrap"],True)
                             
                     
                 #jeśli nie jest to pierwsze uruchomienie to uruchamia normalnie
@@ -111,6 +118,9 @@ class run_scrapper:
                     if config[list_website]["website_name"] == "theitprotocol":
                         theitprotocol = theitprotocol_scrapper()
                         theitprotocol.scrap(config[list_website]["website_to_scrap"],False)
+                    if config[list_website]["website_name"] == "czy_jest_eldorado":
+                        czy_jest_eldorado = czy_jest_eldorado_scrapper()
+                        czy_jest_eldorado.scrap(config[list_website]["website_to_scrap"],False) 
 
                     
     
