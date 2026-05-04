@@ -12,6 +12,17 @@ Ten projekt to bot Discorda, który scrapuje informacje o ofertach pracy z róż
 
 1. Sklonuj repozytorium na swoje lokalne środowisko.
 2. Zainstaluj wymagane zależności za pomocą `pip install -r requirements.txt`.
+   
+	Opcjonalnie — Playwright (do renderowania stron z JavaScript/anty-bot):
+
+	Jeśli chcesz korzystać z Playwright (używany do renderowania stron wymagających JS lub weryfikacji), zainstaluj go osobno i pobierz przeglądarki:
+
+	```bash
+	pip install playwright
+	python -m playwright install
+	```
+
+	Po instalacji Playwright będzie używany tylko wtedy, gdy scraper wykryje komunikat wymagający aktualizacji przeglądarki.
 3. Utwórz plik konfiguracyjny `configs/websites.ini` zgodnie z szablonem poniżej lub pozwól skryptowi utworzyć go automatycznie przy pierwszym uruchomieniu.
 4. Ustaw swoje Discord Webhook URL w pliku konfiguracyjnym.
 

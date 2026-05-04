@@ -2,6 +2,7 @@ import cloudscraper
 import bs4
 
 from database_operations import database_operations
+from class_folder.update_browser import update_browser
 
 
 class students_pl_scrapper:
@@ -21,8 +22,19 @@ class students_pl_scrapper:
 
         res = scraper.get(url, timeout=15)
         res.raise_for_status()
+        # jeśli serwer zwrócił komunikat o konieczności aktualizacji przeglądarki
+        content_html = res.text
+        ub = update_browser()
+        try:
+            if ub.is_update_required(content_html):
+                rendered = ub.fetch_html(url)
+                if rendered:
+                    content_html = rendered
+        except Exception:
+            pass
+
         # przekształca html obiekt bs4 do przeszukiwania strony
-        content = bs4.BeautifulSoup(res.text,features="html.parser")
+        content = bs4.BeautifulSoup(content_html,features="html.parser")
 
         # szuka elementu
         elems = content.findAll(attrs={"class": "c-ListingCard"})

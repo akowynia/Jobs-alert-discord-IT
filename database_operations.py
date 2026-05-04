@@ -3,6 +3,11 @@ from class_folder.webhook_send import webhook_send
 import os
 from configparser import RawConfigParser
 from datetime import date
+import logging
+
+# Silence matplotlib debug spam (font_manager, pyplot, etc.)
+logging.getLogger('matplotlib').setLevel(logging.WARNING)
+
 from matplotlib import pyplot as plt
 import matplotlib.dates as mdates
 import time
