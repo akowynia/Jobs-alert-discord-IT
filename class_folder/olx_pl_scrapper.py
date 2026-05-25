@@ -1,5 +1,8 @@
 import cloudscraper
 import bs4
+import urllib.parse
+import re
+import traceback
 
 from database_operations import database_operations
 from class_folder.update_browser import update_browser
@@ -14,7 +17,6 @@ class olx_pl_scrapper:
         pobiera dane z strony olx
         """
         url = link
-        # nawiązuje połączenie
         scraper = cloudscraper.create_scraper(
             browser={
                 'browser': 'chrome',
@@ -24,7 +26,6 @@ class olx_pl_scrapper:
         )
         res = scraper.get(url, timeout=15)
         res.raise_for_status()
-        # jeśli serwer zwrócił komunikat o konieczności aktualizacji przeglądarki
         content_html = res.text
         ub = update_browser()
         try:
@@ -35,36 +36,54 @@ class olx_pl_scrapper:
         except Exception:
             pass
 
-        # przekształca html obiekt bs4 do przeszukiwania strony
-        content = bs4.BeautifulSoup(content_html,features="html.parser")
+        content = bs4.BeautifulSoup(content_html, features="html.parser")
 
-        elems = content.findAll(attrs={"data-cy": "l-card"})
-        
-        for elements in elems:
+        # różne możliwe selektory kart ofertowych, preferuj data-cy l-card
+        items = content.select('a[data-cy="l-card"], [data-cy="l-card"], a[data-testid="ad-list-item"], .offer, .aditem') or []
 
+        for node in items:
             try:
-                #rozbiera elementy na części
-                link = elements.find_all('a')
-                # zmieniono z h6 na h4 / 2024-12-10
-                title = elements.find_all('h4')
-                region = elements.find_all('span')
-                
-                # data = [link[0].get('href'), title[0].get_text(),region[0].get_text()]
+                # znajdź link (element może być samym <a> lub zawierać <a>)
+                href_tag = node if node.name == 'a' and node.get('href') else node.select_one('a[href]')
+                if not href_tag:
+                    continue
+                href = href_tag.get('href', '').strip()
+                if not href:
+                    continue
+
+                full_link = urllib.parse.urljoin('https://www.olx.pl', href)
+
+                # tytuł — kilka możliwych miejsc
+                title_tag = node.select_one('h4') or node.select_one('h3') or node.select_one('strong') or href_tag
+                if hasattr(title_tag, 'get_text'):
+                    title = title_tag.get_text(strip=True)
+                else:
+                    title = str(title_tag).strip()
+
+                if not title:
+                    title = href_tag.get_text(strip=True) or 'Brak tytułu'
+
+                # region — wybierz pierwszy sensowny span z literami (pomiń ceny)
+                region = 'Brak regionu'
+                spans = node.find_all('span')
+                for s in spans:
+                    txt = s.get_text(strip=True)
+                    if not txt:
+                        continue
+                    if re.search(r'\d', txt) and 'zł' in txt:
+                        continue
+                    if re.search(r'[A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż]', txt):
+                        region = txt
+                        break
 
                 data_op = database_operations()
-                #link oferty, pobiera nie link a cześć wiec dodaje brakującą część
-                olx_link = "https://www.olx.pl" + link[0].get('href')
-                if first == True:
-                    #jeśli jest to pierwsze uruchomienie to dodaje do bazy danych
-                    data_op.add_first_time(
-                        olx_link, title[0].get_text(), region[0].get_text(), "olx")
+                if first is True:
+                    data_op.add_first_time(full_link, title, region, "olx")
                 else:
-                    #jeśli nie to sprawdza czy dany link istnieje w bazie danych
-                    if data_op.check_duplicate(olx_link) is not False:
-                        data_op.add(
-                            olx_link, title[0].get_text(), region[0].get_text(), "olx")
-
+                    if data_op.check_duplicate(full_link) is not False:
+                        data_op.add(full_link, title, region, "olx")
             except Exception as e:
-                print("not exist",e,"olx")
+                print("[olx] item parse error:", e)
+                traceback.print_exc()
 
 
