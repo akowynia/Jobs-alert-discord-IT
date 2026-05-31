@@ -1,5 +1,6 @@
 import cloudscraper
 import bs4
+from urllib.parse import urljoin, urlparse, urlunparse
 
 from database_operations import database_operations
 from class_folder.update_browser import update_browser
@@ -56,8 +57,10 @@ class theitprotocol_scrapper:
 
                 data_op = database_operations()
 
-                # link oferty, pobiera nie link a cześć wiec dodaje brakującą część
-                link = "https://theprotocol.it" + link
+                # link oferty: dołącz bazę i znormalizuj (usuń parametry zapytania)
+                link = urljoin("https://theprotocol.it", link)
+                parsed = urlparse(link)
+                link = urlunparse((parsed.scheme, parsed.netloc, parsed.path, '', '', ''))
 
                 if first == True:
                     # jeśli jest to pierwsze uruchomienie to dodaje do bazy danych
